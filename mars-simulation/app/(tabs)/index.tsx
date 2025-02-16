@@ -33,16 +33,36 @@
  * - Custom light and dark colors in `View` ensure consistent theming throughout the app.
  */
 
-import { ImageBackground, StyleSheet } from 'react-native'; // Core components for layout and styling
+import { ImageBackground, StyleSheet, Button } from 'react-native'; // Core components for layout and styling
 import EditScreenInfo from '@/components/EditScreenInfo'; // Custom component to display file path info
 import UserInput from '@/components/UserInput'; // Import the UserInput component
 import { Text, View } from '@/components/Themed'; // Themed components for consistent app design
 import { useState, useEffect } from 'react'; // Import a library to keep state in our app
 import  AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage to store data}
+import { Audio } from 'expo-av'; // Import Audio from expo-av to play audio
 
 // ############################################################
 // TabOneScreen Component
 // ============================================================
+// First we need to create a function that will be the background sound of thunder
+function PlaySoundOfThunder() {
+  (async () => {
+    try {
+      await Audio.setIsEnabledAsync(true);
+      const sound = new Audio.Sound();
+      // here we load the sound file from the local directory
+      await sound.loadAsync(require('../../assets/sound/thunder.mp3'));
+      // Controls whether the sound should play in a loop
+      await sound.setIsLoopingAsync(false);
+      // Volume range is 0 - 1. 0 is off, 1 is max volume, do not set above 1.
+      await sound.setVolumeAsync(1);
+      await sound.playAsync();
+    } catch (error) {
+      console.log(error);
+    }
+  })();
+}
+
 export default function TabOneScreen() {
   return (
     // The main container with dynamic theming
@@ -60,6 +80,13 @@ export default function TabOneScreen() {
         
         {/* Separator for visual structure */}
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+
+        {/* We will create a button that when pressed will play the sound of thunder */}
+        <Button
+          title="Play Sound of Thunder"
+          color="#FF8E01" // Custom color for the button to match the theme
+          onPress={PlaySoundOfThunder}
+        />
         
         {/* Component displaying editable screen info */}
         <EditScreenInfo path="app/(tabs)/index.tsx" />
